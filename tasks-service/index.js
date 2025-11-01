@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 4001;
 const MONGODB_URI = process.env.MONGODB_URI;
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 app.use("/api/tasks", tasksRouter);
@@ -16,12 +16,12 @@ app.use("/api/tasks", tasksRouter);
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log("✅ MongoDB conectado (tasks-service)");
+    console.log("MongoDB conectado (tasks-service)");
     app.listen(PORT, () => {
-      console.log(`🚀 Tasks Service corriendo en http://localhost:${PORT}`);
+      console.log(`Tasks Service corriendo en http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("❌ Error conectando Mongo (tasks-service):", err.message);
+    console.error("Error conectando Mongo (tasks-service):", err.message);
     process.exit(1);
   });

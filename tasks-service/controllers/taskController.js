@@ -1,7 +1,7 @@
 import axios from "axios";
 import Task from "../models/Task.js";
 
-const AUTH_VERIFY_URL = process.env.AUTH_SERVICE_URL; // ej: http://localhost:4000/api/users/verify
+const AUTH_VERIFY_URL = process.env.AUTH_SERVICE_URL;
 
 async function verifyUserFromAuth(authorizationHeader) {
   if (!authorizationHeader || !authorizationHeader.startsWith("Basic "))
@@ -11,11 +11,10 @@ async function verifyUserFromAuth(authorizationHeader) {
     const res = await axios.get(AUTH_VERIFY_URL, {
       headers: { Authorization: authorizationHeader },
     });
-    // res.status === 200 si ok
-    return res.data; // { userId, email }
+
+    return res.data;
   } catch (err) {
-    // Útil para depurar:
-    // console.error('verify error:', err.response?.status, err.response?.data || err.message);
+    console.log(err);
     return null;
   }
 }
@@ -63,15 +62,12 @@ export async function updateTask(req, res) {
   try {
     const authHeader = req.headers.authorization;
 
-    // 1. Verificar usuario:
     const verified = await verifyUserFromAuth(authHeader);
     if (!verified) return res.status(401).json({ error: "Unauthorized" });
 
-    // 2. Extraer id de la tarea desde params:
     const { id } = req.params;
     const { title, description, completed } = req.body;
 
-    // 3. Buscar la tarea y asegurarnos que pertenece al usuario
     const task = await Task.findOne({ _id: id, userId: verified.userId });
     if (!task) {
       return res
@@ -79,7 +75,6 @@ export async function updateTask(req, res) {
         .json({ error: "Tarea no encontrada o no pertenece al usuario" });
     }
 
-    // 4. Actualizar solo lo que viene
     if (title !== undefined) task.title = title;
     if (description !== undefined) task.description = description;
     if (completed !== undefined) task.completed = completed;
@@ -97,14 +92,11 @@ export async function deleteTask(req, res) {
   try {
     const authHeader = req.headers.authorization;
 
-    // 1) Verificar usuario contra el auth-service
     const verified = await verifyUserFromAuth(authHeader);
     if (!verified) return res.status(401).json({ error: "Unauthorized" });
 
-    // 2) Tomar el id de la tarea
     const { id } = req.params;
 
-    // 3) Buscar y eliminar SOLO si pertenece al usuario
     const deleted = await Task.findOneAndDelete({
       _id: id,
       userId: String(verified.userId),
@@ -126,14 +118,11 @@ export async function getTaskById(req, res) {
   try {
     const authHeader = req.headers.authorization;
 
-    // 1) Verificamos usuario
     const verified = await verifyUserFromAuth(authHeader);
     if (!verified) return res.status(401).json({ error: "Unauthorized" });
 
-    // 2) Extraemos el ID desde la URL
     const { id } = req.params;
 
-    // 3) Buscamos la tarea que pertenezca a ese userId
     const task = await Task.findOne({
       _id: id,
       userId: String(verified.userId),
@@ -145,7 +134,6 @@ export async function getTaskById(req, res) {
         .json({ error: "Tarea no encontrada o no pertenece al usuario" });
     }
 
-    // 4) Enviar la tarea encontrada
     return res.status(200).json(task);
   } catch (e) {
     console.error("Error obteniendo tarea por ID:", e);

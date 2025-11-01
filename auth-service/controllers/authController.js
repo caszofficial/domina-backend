@@ -12,16 +12,13 @@ export const registerUser = async (req, res) => {
         .json({ error: "Email y password son obligatorios" });
     }
 
-    // Verificar si el email ya existe
     const userExists = await User.findOne({ email: email.toLowerCase() });
     if (userExists) {
       return res.status(400).json({ error: "El usuario ya está registrado" });
     }
 
-    // ✅ Hash de contraseña (como tú pediste)
     const passwordHash = bcrypt.hashSync(password, 10);
 
-    // Guardar usuario
     const newUser = await User.create({
       email: email.toLowerCase(),
       passwordHash,
@@ -47,7 +44,6 @@ export const loginUser = async (req, res) => {
         .json({ error: "Falta header Authorization Basic" });
     }
 
-    // Extraer las credenciales de base64
     const base64Credentials = authHeader.split(" ")[1];
     const credentials = Buffer.from(base64Credentials, "base64").toString(
       "utf8"
@@ -58,13 +54,11 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ error: "Email o password no enviados" });
     }
 
-    // Buscar usuario
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(401).json({ error: "Credenciales inválidas" });
     }
 
-    // Validar contraseña
     const passwordMatch = bcrypt.compareSync(password, user.passwordHash);
     if (!passwordMatch) {
       return res.status(401).json({ error: "Credenciales inválidas" });
@@ -109,7 +103,6 @@ export const verifyUser = async (req, res) => {
       return res.status(401).json({ error: "Credenciales inválidas" });
     }
 
-    // ✅ Devuelve solo lo necesario (lo que consume el microservicio de tareas)
     return res.status(200).json({
       userId: user._id,
       email: user.email,
