@@ -4,12 +4,12 @@ import User from "../models/User.js";
 // POST /api/users/register
 export const registerUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || !name) {
       return res
         .status(400)
-        .json({ error: "Email y password son obligatorios" });
+        .json({ error: "Nombre, Email y Contraseña son obligatorios" });
     }
 
     const userExists = await User.findOne({ email: email.toLowerCase() });
@@ -26,7 +26,7 @@ export const registerUser = async (req, res) => {
 
     res.status(201).json({
       message: "Usuario registrado correctamente",
-      user: { id: newUser._id, email: newUser.email },
+      user: { id: newUser._id, email: newUser.email, name: newUser.name },
     });
   } catch (error) {
     console.error(error);
@@ -66,7 +66,7 @@ export const loginUser = async (req, res) => {
 
     return res.status(200).json({
       message: "Login exitoso",
-      user: { id: user._id, email: user.email },
+      user: { id: user._id, email: user.email, name: user.name },
     });
   } catch (error) {
     console.error("Error en login:", error);
@@ -106,6 +106,7 @@ export const verifyUser = async (req, res) => {
     return res.status(200).json({
       userId: user._id,
       email: user.email,
+      name: user.name,
     });
   } catch (error) {
     console.error("Error en /verify:", error);
