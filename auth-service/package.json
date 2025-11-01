@@ -20,6 +20,7 @@
   "homepage": "https://github.com/caszofficial/domina-backend#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongodb": "6.20.0",
