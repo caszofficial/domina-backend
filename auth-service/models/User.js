@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+    name: {
+      type: String,
+      required: true,
+    },
     passwordHash: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
   },
