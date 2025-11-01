@@ -21,6 +21,7 @@ export const registerUser = async (req, res) => {
 
     const newUser = await User.create({
       email: email.toLowerCase(),
+      name: name.trim(),
       passwordHash,
     });
 
